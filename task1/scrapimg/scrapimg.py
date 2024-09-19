@@ -69,13 +69,6 @@ class ScrapImg:
         def __str__(self):
             return repr(self.value)
 
-    class FolderError(Exception):
-        def __init__(self, value):
-            self.value = value
-
-        def __str__(self):
-            return repr(self.value)
-
     def __init__(self, url_: str, folder_path: str = None):
         if urlparse(url_).scheme == "":
             url_ = "https://" + url_
@@ -89,12 +82,9 @@ class ScrapImg:
         self.image_links = []
 
     def _prepare_folder(self):
-        try:
-            if self.path.exists():
-                shutil.rmtree(self.path)
-            self.path.mkdir(parents=True)
-        except Exception as e:
-            raise ScrapImg.FolderError(f"Something wrong with folder management {e}")
+        if self.path.exists():
+            shutil.rmtree(self.path)
+        self.path.mkdir(parents=True)
 
     def _prepare_css_links(self, css_links: str):
 
