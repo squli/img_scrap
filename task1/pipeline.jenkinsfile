@@ -1,5 +1,9 @@
 pipeline {
     agent any
+	
+	options {
+		timeout(time: 5, unit: 'MINUTES') 
+	}
 
     // Define parameters for the pipeline
     parameters {
@@ -15,7 +19,7 @@ pipeline {
 	
 	    stage('Clone Git Repository') {
             steps {			
-                git url: 'https://github.com/squli/img_scrap.git', branch: 'task1'
+                git url: 'https://github.com/squli/img_scrap.git'
             }
         }
 	
@@ -32,31 +36,13 @@ pipeline {
             }
         }
 		
-		//stage('Run unit tests') {
-        //    steps {
-        //        script {
-        //            echo "Running unit-tests for the script"
-		//
-		//			dir ('task1') {
-		//				def ret = sh(returnStatus: true, script: "./venv/bin/python3 scrapimg/test_scrapimg.py")
-		//				if (ret != 0) {
-		//					unstable('Unit tests failed, return code is ' + ret)
-		//				}
-		//			}
-        //        }				
-        //    }
-        //}
-
         stage('Run Python Script') {
             steps {
                 script {
                     echo "Running Python script with url: ${params.URL}"
+					
 					dir ('task1') {
-						// Run the Python script and capture the output
-						def ret = sh(returnStatus: true, script: "./venv/bin/python3 main.py -u ${params.URL} -p artifacts -v")
-						if (ret != 0) {
-							failure('Script failed, return code is ' + ret)
-						}
+						sh "./venv/bin/python3 main.py -u ${params.URL} -p artifacts -v"
 					}
                 }
             }
