@@ -25,7 +25,8 @@ pipeline {
                     echo "Setting up environment..."
 					sh 'python3 --version'
 					dir ('task1') {
-						sh 'pip3 install -r requirements.txt'
+						sh 'python3 -m venv ./venv'
+						sh './venv/bin/pip3 install -r requirements.txt'
 					}
                 }
             }
@@ -37,11 +38,9 @@ pipeline {
                     echo "Running unit-tests for the script"
 
 					dir ('task1') {
-						dir ('test') {
-							def ret = sh(returnStatus: true, script: "python3 test_scrapimg.py")
-							if (ret != 0) {
-								unstable('Unit tests failed, return code is ' + ret)
-							}
+						def ret = sh(returnStatus: true, script: "./venv/bin/python3 scrapimg/test_scrapimg.py")
+						if (ret != 0) {
+							unstable('Unit tests failed, return code is ' + ret)
 						}
 					}
                 }				
@@ -54,7 +53,7 @@ pipeline {
                     echo "Running Python script with url: ${params.URL}"
 					dir ('task1') {
 						// Run the Python script and capture the output
-						def ret = sh(returnStatus: true, script: "python3 main.py url ${params.URL}")
+						def ret = sh(returnStatus: true, script: "./venv/bin/python3 main.py url ${params.URL}")
 						if (ret != 0) {
 							failure('Script failed, return code is ' + ret)
 						}
