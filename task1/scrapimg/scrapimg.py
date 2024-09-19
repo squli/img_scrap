@@ -232,7 +232,7 @@ class ScrapImg:
                 string += f"\t {link} \n"
         string += f"List of files in {self.path} folder:\n"
         for f in files:
-            string += f"\t {f} \n"
+            string += f"\t {f} size={f.stat().st_size} \n"
         string += f"Amount of links={len(self.image_links)}, files={len(files)}"
         return string
 
@@ -246,7 +246,7 @@ class ScrapImg:
 
 if __name__ == '__main__':
     print("Example of using scrapimg: ")
-    #url = "yle.fi/a/74-20112293"
+    url = "yle.fi/a/74-20112293"
     print(f"Try to download all images from {url}")
 
     s = ScrapImg(url, "niceFolder")

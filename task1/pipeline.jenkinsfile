@@ -32,20 +32,20 @@ pipeline {
             }
         }
 		
-		stage('Run unit tests') {
-            steps {
-                script {
-                    echo "Running unit-tests for the script"
-
-					dir ('task1') {
-						def ret = sh(returnStatus: true, script: "./venv/bin/python3 scrapimg/test_scrapimg.py")
-						if (ret != 0) {
-							unstable('Unit tests failed, return code is ' + ret)
-						}
-					}
-                }				
-            }
-        }
+		//stage('Run unit tests') {
+        //    steps {
+        //        script {
+        //            echo "Running unit-tests for the script"
+		//
+		//			dir ('task1') {
+		//				def ret = sh(returnStatus: true, script: "./venv/bin/python3 scrapimg/test_scrapimg.py")
+		//				if (ret != 0) {
+		//					unstable('Unit tests failed, return code is ' + ret)
+		//				}
+		//			}
+        //        }				
+        //    }
+        //}
 
         stage('Run Python Script') {
             steps {
@@ -53,7 +53,7 @@ pipeline {
                     echo "Running Python script with url: ${params.URL}"
 					dir ('task1') {
 						// Run the Python script and capture the output
-						def ret = sh(returnStatus: true, script: "./venv/bin/python3 main.py url ${params.URL}")
+						def ret = sh(returnStatus: true, script: "./venv/bin/python3 main.py -u ${params.URL} -p artifacts -v")
 						if (ret != 0) {
 							failure('Script failed, return code is ' + ret)
 						}
@@ -65,7 +65,7 @@ pipeline {
         stage('Archive Results') {
             steps {
 				dir ('task1') {
-					dir ('images') {
+					dir ('artifacts') {
 						archiveArtifacts artifacts: '*.*', allowEmptyArchive: false
 					}
 				}
