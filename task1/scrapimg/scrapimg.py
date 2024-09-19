@@ -42,7 +42,7 @@ def sanitize_name(folder_name: str) -> str:
 
 def fetch_url(url_to_fetch: str):
     fake_headers = {
-        "Accept": "text/html",
+        "Accept": "*",
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 12_3_1) AppleWebKit/605.1.15 (KHTML, like Gecko) "
                       "Version/15.4 Safari/605.1.15",
         "Accept-Encoding": "*",
@@ -177,7 +177,7 @@ class ScrapImg:
             else:
                 assert False, f"This encoder {encoder_type} type doesn't support"
             filename = Path(str(zlib.crc32(image_data)) + "." + str(file_format))
-            with open(Path(path / filename), 'wb') as file:
+            with open(Path(path / filename), 'wb+') as file:
                 file.write(image_data)
         else:
             response = fetch_url(url_)
@@ -191,7 +191,7 @@ class ScrapImg:
                 filename = Path(sanitize_name(Path(url_).stem)[:ScrapImg.MAX_FILENAME_LEN] + "_" +
                                 str(zlib.crc32(url_.encode())) + extension)
             with open(Path(path / filename), 'wb+') as out_file:
-                shutil.copyfileobj(response.raw, out_file)
+                out_file.write(response.content)
 
     def get_images_links(self, verbose=False):
         """

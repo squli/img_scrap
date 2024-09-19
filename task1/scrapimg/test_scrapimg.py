@@ -60,10 +60,12 @@ class TestCase(unittest.TestCase):
 
     def test_wrong_url_webpage(self):
         urls = ["httpsjhsfkurfujdks", "http://fdgdfgdfgdfg"]
+        i = 0
         for u in urls:
             print(f"Download from {u[:64]}")
-            scrap_img = ScrapImg(url_=u)
+            scrap_img = ScrapImg(url_=u, folder_path=f"wrong_url_{i}")
             self.assertRaises(ScrapImg.UrlFetchingError, scrap_img.scrap_images)
+            i += 1
 
     def test_wrong_path(self):
         url = "https://varjo.com/products/xr-4-secure-edition/"
