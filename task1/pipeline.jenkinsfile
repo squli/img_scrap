@@ -1,0 +1,85 @@
+pipeline {
+    agent any
+
+    // Define parameters for the pipeline
+    parameters {
+        string(name: 'URL', defaultValue: '', description: 'url to download images from')
+    }
+
+    stages {
+		stage('Cleanup') {
+			steps {
+				cleanWs()	
+			}
+		}
+	
+	    stage('Clone Git Repository') {
+            steps {			
+                git url: 'https://github.com/squli/img_scrap.git'
+            }
+        }
+	
+        stage('Setup') {
+            steps {
+                script {
+                    echo "Setting up environment..."
+					sh 'python3 --version'
+					dir ('task1') {
+						sh 'pip3 install -r requirements.txt'
+					}
+                }
+            }
+        }
+		
+		stage('Run unit tests') {
+            steps {
+                script {
+                    echo "Running unit-tests for the script"
+
+					dir ('task1') {
+						dir ('test') {
+							def ret = sh(returnStatus: true, script: "python3 test_scrapimg.py")
+							if (ret != 0) {
+								unstable('Unit tests failed, return code is ' + ret)
+							}
+						}
+					}
+                }				
+            }
+        }
+
+        stage('Run Python Script') {
+            steps {
+                script {
+                    echo "Running Python script with url: ${params.URL}"
+					dir ('task1') {
+						// Run the Python script and capture the output
+						def ret = sh(returnStatus: true, script: "python3 main.py url ${params.URL}")
+						if (ret != 0) {
+							failure('Script failed, return code is ' + ret)
+						}
+					}
+                }
+            }
+        }
+
+        stage('Archive Results') {
+            steps {
+				dir ('task1') {
+					dir ('images') {
+						archiveArtifacts artifacts: '*.*', allowEmptyArchive: false
+					}
+				}
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed!'
+        }
+    }
+}
