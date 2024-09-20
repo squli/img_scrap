@@ -42,10 +42,10 @@ pipeline {
                     echo "Running unit-tests for the script"
         
                     dir ('task1') {
-						def ret = sh(returnStatus: true, script: "./venv/bin/python3 scrapimg/test_scrapimg.py")
-						if (ret != 0) {
-							unstable('Unit tests failed, return code is ' + ret)
-						}
+                        def ret = sh(returnStatus: true, script: "./venv/bin/python3 scrapimg/test_scrapimg.py")
+                        if (ret != 0) {
+                            unstable('Unit tests failed, return code is ' + ret)
+                        }
                     }
                 }                
             }
@@ -57,11 +57,11 @@ pipeline {
                     echo "Running Python script with url: ${params.URL}"
                     
                     dir ('task1') {
-						// Run the Python script and capture the output
-						def ret = sh(returnStatus: true, script: "./venv/bin/python3 main.py -u ${params.URL} -p artifacts -v")
-						if (ret != 0) {
-							failure('Script failed, return code is ' + ret)
-						}
+                        // Run the Python script and capture the output
+                        def ret = sh(returnStatus: true, script: "./venv/bin/python3 main.py -u ${params.URL} -p artifacts -v")
+                        if (ret != 0) {
+                            failure('Script failed, return code is ' + ret)
+                        }
                     }
                 }
             }
