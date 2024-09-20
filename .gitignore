@@ -163,3 +163,4 @@ cython_debug/
 
 task1/venv/
 task1/.idea/
+task2/build/
