@@ -1,0 +1,82 @@
+pipeline {
+    agent any
+    
+    options {
+        timeout(time: 5, unit: 'MINUTES') 
+    }
+
+    // Define parameters for the pipeline
+    parameters {
+        string(name: 'URL', defaultValue: '', description: 'url to download images from')
+    }
+
+    stages {
+        stage('Cleanup') {
+            steps {
+                cleanWs()    
+            }
+        }
+    
+        stage('Clone Git Repository') {
+            steps {            
+                git url: 'https://github.com/squli/img_scrap.git'
+            }
+        }
+    
+        stage('Setup') {
+            steps {
+                script {
+                    echo "Setting up environment..."
+                    sh 'python3 --version'
+                    dir ('task1') {
+                        sh 'python3 -m venv ./venv'
+                        sh './venv/bin/pip3 install -r requirements.txt'
+                    }
+                }
+            }
+        }
+        
+        stage('Run unit tests') {
+            steps {
+                script {
+                    echo "Running unit-tests for the script"
+        
+                    dir ('task1') {
+                        sh './venv/bin/python3 scrapimg/test_scrapimg.py'
+                    }
+                }                
+            }
+        }
+
+        stage('Run Python Script') {
+            steps {
+                script {
+                    echo "Running Python script with url: ${params.URL}"
+                    
+                    dir ('task1') {
+                        sh "./venv/bin/python3 main.py -u ${params.URL} -p artifacts -v"
+                    }
+                }
+            }
+        }
+
+        stage('Archive Results') {
+            steps {
+                dir ('task1') {
+                    dir ('artifacts') {
+                        archiveArtifacts artifacts: '*.*', allowEmptyArchive: false
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed!'
+        }
+    }
+}
