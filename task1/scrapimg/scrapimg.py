@@ -86,7 +86,12 @@ class ScrapImg:
             shutil.rmtree(self.path)
         self.path.mkdir(parents=True)
 
-    def _prepare_css_links(self, css_links: str):
+    def _prepare_css_links(self, css_links):
+        """
+        Append to list of image links image files from the css files
+        :param css_links: list with links to css files
+        :return:
+        """
 
         def get_images_from_css(css_link: str, css_file_contents: str):
             url_pattern = r'url\((.*?)\)'
@@ -110,8 +115,8 @@ class ScrapImg:
 
     def _prepare_image_links(self, img_tags):
         """
-        Make absolute links  to images from attributes of the img tag
-        :param img_tags: records from html parser with img-tags
+        Append links to list of image links from attributes of the img tag
+        :param img_tags: list of records from html parser with img-tags
         :return:
         """
 
@@ -155,6 +160,12 @@ class ScrapImg:
 
     @staticmethod
     def _downloader_task(url_: str, path: str):
+        """
+        Worker to handle image links: it download normal links or convert encoded images to files
+        :param url_: link to download
+        :param path: folder to save
+        :return:
+        """
         if url_.startswith('data:image'):
             # not need to download, just convert value to picture and save it
             url_ = url_.replace("data:image/", "").replace(';', ',', 1)
@@ -185,8 +196,8 @@ class ScrapImg:
 
     def get_images_links(self):
         """
-        Get webpage, parse it and make a lists for <img../> and <link .. as="style"/>
-        :return:
+        Get webpage, parse it and make a lists for <img../> and for <link .. as="style"/>
+        :return: amount of <img> tags, amount of found css files
         """
         response = fetch_url(self.url)
         parser = ImgTagAndCssParser(self.url)
