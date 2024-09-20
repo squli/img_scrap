@@ -26,7 +26,8 @@ class TestCase(unittest.TestCase):
     def setUpClass(cls):
         for item in Path.cwd().iterdir():
             if item.is_dir():
-                shutil.rmtree(item)  # Remove directory and its contents
+                if "scrap_img_" in item.name or "wrong_url_" in item.name:
+                    shutil.rmtree(item)  # Remove directory and its contents
 
     def test_scrap_webpage(self):
         urls = ["https://varjo.com/products/xr-4-secure-edition/",  # large images, srcsets, lazy images

@@ -183,7 +183,7 @@ class ScrapImg:
             with open(Path(path / filename), 'wb+') as out_file:
                 out_file.write(response.content)
 
-    def get_images_links(self, verbose=False):
+    def get_images_links(self):
         """
         Get webpage, parse it and make a lists for <img../> and <link .. as="style"/>
         :return:
@@ -194,10 +194,6 @@ class ScrapImg:
 
         self._prepare_image_links(parser.img_tags)
         self._prepare_css_links(parser.css_links)
-
-        if verbose:
-            print(parser.img_tags)
-            print(parser.css_links)
 
         return len(parser.img_tags), len(parser.css_links)
 
@@ -228,7 +224,7 @@ class ScrapImg:
 
     def scrap_images(self, verbose=False):
         self._prepare_folder()
-        self.get_images_links(verbose=verbose)
+        self.get_images_links()
         self.download_images()
         if verbose:
             print(self)
